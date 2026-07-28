@@ -7,7 +7,7 @@
 
 body {
   font-family: Arial, sans-serif;
-  background: #f7f7f8;
+  background: white;
   color: #171717;
 }
 
@@ -95,10 +95,7 @@ a {
   max-width: 1400px;
   margin: 0 auto;
 
-  background:
-    radial-gradient(circle at 85% 20%, #ffe1d8 0, transparent 25%),
-    radial-gradient(circle at 10% 80%, #e5e5ff 0, transparent 25%),
-    #f7f7f8;
+  background: white;
 }
 
 
