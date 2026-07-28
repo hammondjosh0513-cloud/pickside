@@ -780,19 +780,39 @@ function Profile() {
 
   const { username } = useParams()
 
-  const storageKey = `pickside-${username}`
+  const [messages, setMessages] = useState([])
 
-  const messages = JSON.parse(
+  useEffect(() => {
 
-    localStorage.getItem(storageKey)
+    loadMessages()
 
-  ) || []
+  }, [])
 
-  const answeredMessages = messages.filter(
+  async function loadMessages() {
 
-    (message) => message.replied
+    const { data, error } = await supabase
 
-  )
+      .from("messages")
+
+      .select("*")
+
+      .eq("username", username)
+
+      .eq("replied", true)
+
+      .order("created_at", { ascending: false })
+
+    if (error) {
+
+      console.log(error)
+
+      return
+
+    }
+
+    setMessages(data)
+
+  }
 
   return (
 
@@ -812,44 +832,63 @@ function Profile() {
         </div>
 
         <h1>
+
           {username}'s Public Profile
+
         </h1>
 
         <p>
+
           Questions that have been answered.
+
         </p>
 
-        {answeredMessages.length === 0 ? (
+        {messages.length === 0 ? (
 
           <p>
+
             No answered questions yet.
+
           </p>
 
         ) : (
 
-          answeredMessages.map((message, index) => (
+          messages.map((message) => (
 
             <div
-              key={index}
+
+              key={message.id}
+
               className="profile-message"
+
             >
 
               <h3>
+
                 💬 Question
+
               </h3>
 
               <p>
-                {message.text}
+
+                {message.question}
+
               </p>
 
               <h3
+
                 style={{ marginTop: "15px" }}
+
               >
+
                 ✅ Reply
+
               </h3>
 
               <p>
-                {message.reply}
+
+                {message.answer}
+
               </p>
 
             </div>
