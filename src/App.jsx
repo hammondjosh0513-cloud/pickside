@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from "react"
 
 import {
   BrowserRouter,
@@ -365,17 +365,37 @@ function Inbox() {
 
   const { username } = useParams()
 
-  const [messages] = useState(() => {
+  const [messages, setMessages] = useState([])
 
-    const storageKey = `pickside-${username}`
+  useEffect(() => {
 
-    const savedMessages = localStorage.getItem(storageKey)
+    loadMessages()
 
-    return savedMessages
-      ? JSON.parse(savedMessages)
-      : []
+  }, [])
 
-  })
+  async function loadMessages() {
+
+    const { data, error } = await supabase
+
+      .from("messages")
+
+      .select("*")
+
+      .eq("username", username)
+
+      .order("created_at", { ascending: false })
+
+    if (error) {
+
+      console.log(error)
+
+      return
+
+    }
+
+    setMessages(data)
+
+  }
 
   return (
 
@@ -472,82 +492,77 @@ function Inbox() {
 
           <div className="messages-list">
 
-            {messages.map((message, index) => (
+            {messages.map((message) => (
 
-              <Link
-                key={index}
-                to={`/message/${username}/${index}`}
-                className="message-link"
+              <div
+                key={message.id}
+                className="inbox-message"
               >
 
-                <div className="inbox-message">
+                <div className="inbox-message-icon">
+                  💬
+                </div>
 
-                  <div className="inbox-message-icon">
-                    💬
+                <div className="inbox-message-content">
+
+                  <p>
+
+                    {message.question.length > 45
+                      ? message.question.slice(0, 45) + "..."
+                      : message.question}
+
+                  </p>
+
+                  <span>
+
+                    {new Date(message.created_at).toLocaleString()}
+
+                  </span>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "10px",
+                      marginTop: "10px"
+                    }}
+                  >
+
+                    <button
+                      onClick={() => {
+
+                        const link =
+                          `${window.location.origin}/question/${message.id}`
+
+                        navigator.clipboard.writeText(link)
+
+                        alert("Question link copied!")
+
+                      }}
+                    >
+
+                      🔗 Copy Question Link
+
+                    </button>
+
                   </div>
 
-                  <div className="inbox-message-content">
+                  {message.replied && (
 
-                    <p>
-
-                      {message.text.length > 45
-                        ? message.text.slice(0, 45) + "..."
-                        : message.text}
-
+                    <p
+                      style={{
+                        color: "green",
+                        fontWeight: "bold",
+                        marginTop: "8px"
+                      }}
+                    >
+                      ✅ Answered
                     </p>
 
-                    <span>
-                      {message.date}
-                    </span>
-
-                    <div
-  style={{
-    display: "flex",
-    gap: "10px",
-    marginTop: "10px"
-  }}
->
-
-  <button
-    onClick={(event) => {
-
-      event.preventDefault()
-
-      const link =
-        `${window.location.origin}/question/${message.id}`
-
-      navigator.clipboard.writeText(link)
-
-      alert("Question link copied!")
-
-    }}
-  >
-
-    🔗 Copy Question Link
-
-  </button>
-
-</div>
-
-                    {message.replied && (
-
-                      <p
-                        style={{
-                          color: "green",
-                          fontWeight: "bold",
-                          marginTop: "8px"
-                        }}
-                      >
-                        ✅ Answered
-                      </p>
-
-                    )}
-
-                  </div>
+                  )}
 
                 </div>
 
-              </Link>
+              </div>
 
             ))}
 
@@ -855,33 +870,91 @@ function AnswerQuestion() {
 
   const { id } = useParams()
 
+  const [question, setQuestion] = useState(null)
   const [answer, setAnswer] = useState("")
   const [sent, setSent] = useState(false)
 
-  const allUsers = Object.keys(localStorage)
+  useEffect(() => {
 
-  let question = null
-  let storageKey = ""
-  let questionIndex = -1
+    loadQuestion()
 
-  for (const key of allUsers) {
+  }, [])
 
-    if (!key.startsWith("pickside-")) continue
+  async function loadQuestion() {
 
-    const questions = JSON.parse(localStorage.getItem(key)) || []
+    const { data, error } = await supabase
 
-    const index = questions.findIndex(
-      (question) => question.id === id
-    )
+      .from("messages")
 
-    if (index !== -1) {
+      .select("*")
 
-      question = questions[index]
-      storageKey = key
-      questionIndex = index
-      break
+      .eq("id", Number(id))
+
+      .single()
+
+    console.log("URL ID:", id)
+    console.log(data)
+    console.log(error)
+
+    if (error) {
+
+      console.log(error)
+
+      return
 
     }
+
+    setQuestion(data)
+
+  }
+
+  async function submitAnswer(event) {
+
+    event.preventDefault()
+
+    if (!answer.trim()) {
+
+      alert("Please write an answer.")
+
+      return
+
+    }
+
+    const { error } = await supabase
+
+      .from("messages")
+
+      .update({
+
+        answer: answer.trim(),
+
+        replied: true
+
+      })
+
+      .eq("id", Number(id))
+
+    if (error) {
+
+      alert(error.message)
+
+      return
+
+    }
+
+    setQuestion({
+
+      ...question,
+
+      answer: answer.trim(),
+
+      replied: true
+
+    })
+
+    setSent(true)
+
+    setAnswer("")
 
   }
 
@@ -903,35 +976,6 @@ function AnswerQuestion() {
 
   }
 
-  function submitAnswer(event) {
-
-    event.preventDefault()
-
-    if (!answer.trim()) {
-
-      alert("Please write an answer.")
-
-      return
-
-    }
-
-    const questions = JSON.parse(
-      localStorage.getItem(storageKey)
-    ) || []
-
-    questions[questionIndex].reply = answer.trim()
-    questions[questionIndex].replied = true
-
-    localStorage.setItem(
-      storageKey,
-      JSON.stringify(questions)
-    )
-
-    setSent(true)
-    setAnswer("")
-
-  }
-
   return (
 
     <div className="user-page">
@@ -940,7 +984,7 @@ function AnswerQuestion() {
 
         <h1>Anonymous Question</h1>
 
-        <p>{question.text}</p>
+        <p>{question.question}</p>
 
         <form onSubmit={submitAnswer}>
 
@@ -959,8 +1003,11 @@ function AnswerQuestion() {
           />
 
           <button
-            className="send-message-button"
+
             type="submit"
+
+            className="send-message-button"
+
           >
 
             Submit Answer
