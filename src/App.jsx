@@ -258,17 +258,19 @@ function UserPage() {
 
     ) || []
 
-    const newMessage = {
+   const newMessage = {
 
-      text: message.trim(),
+  id: Date.now().toString(),
 
-      date: new Date().toLocaleString(),
+  text: message.trim(),
 
-      replied: false,
+  date: new Date().toLocaleString(),
 
-      reply: ''
+  replied: false,
 
-    }
+  reply: ''
+
+}
 
     savedMessages.push(newMessage)
 
@@ -504,6 +506,35 @@ function Inbox() {
                     <span>
                       {message.date}
                     </span>
+
+                    <div
+  style={{
+    display: "flex",
+    gap: "10px",
+    marginTop: "10px"
+  }}
+>
+
+  <button
+    onClick={(event) => {
+
+      event.preventDefault()
+
+      const link =
+        `${window.location.origin}/question/${message.id}`
+
+      navigator.clipboard.writeText(link)
+
+      alert("Question link copied!")
+
+    }}
+  >
+
+    🔗 Copy Question Link
+
+  </button>
+
+</div>
 
                     {message.replied && (
 
@@ -827,6 +858,141 @@ function Profile() {
 
 }
 
+function AnswerQuestion() {
+
+  const { id } = useParams()
+
+  const [answer, setAnswer] = useState("")
+  const [sent, setSent] = useState(false)
+
+  const allUsers = Object.keys(localStorage)
+
+  let question = null
+  let storageKey = ""
+  let questionIndex = -1
+
+  for (const key of allUsers) {
+
+    if (!key.startsWith("pickside-")) continue
+
+    const questions = JSON.parse(localStorage.getItem(key)) || []
+
+    const index = questions.findIndex(
+      (question) => question.id === id
+    )
+
+    if (index !== -1) {
+
+      question = questions[index]
+      storageKey = key
+      questionIndex = index
+      break
+
+    }
+
+  }
+
+  if (!question) {
+
+    return (
+
+      <div className="user-page">
+
+        <div className="user-card">
+
+          <h1>Question not found</h1>
+
+        </div>
+
+      </div>
+
+    )
+
+  }
+
+  function submitAnswer(event) {
+
+    event.preventDefault()
+
+    if (!answer.trim()) {
+
+      alert("Please write an answer.")
+
+      return
+
+    }
+
+    const questions = JSON.parse(
+      localStorage.getItem(storageKey)
+    ) || []
+
+    questions[questionIndex].reply = answer.trim()
+    questions[questionIndex].replied = true
+
+    localStorage.setItem(
+      storageKey,
+      JSON.stringify(questions)
+    )
+
+    setSent(true)
+    setAnswer("")
+
+  }
+
+  return (
+
+    <div className="user-page">
+
+      <div className="user-card">
+
+        <h1>Anonymous Question</h1>
+
+        <p>{question.text}</p>
+
+        <form onSubmit={submitAnswer}>
+
+          <textarea
+
+            placeholder="Write your answer..."
+
+            value={answer}
+
+            onChange={(event) => {
+
+              setAnswer(event.target.value)
+
+            }}
+
+          />
+
+          <button
+            className="send-message-button"
+            type="submit"
+          >
+
+            Submit Answer
+
+          </button>
+
+        </form>
+
+        {sent && (
+
+          <div className="success-message">
+
+            ✅ Your answer has been sent anonymously!
+
+          </div>
+
+        )}
+
+      </div>
+
+    </div>
+
+  )
+
+}
 
 function App() {
 
@@ -865,6 +1031,11 @@ function App() {
           path="/profile/:username"
           element={<Profile />}
         />
+
+        <Route
+  path="/question/:id"
+  element={<AnswerQuestion />}
+/>
 
       </Routes>
 
