@@ -84,31 +84,27 @@ a {
 
 .hero {
   min-height: calc(100vh - 76px);
-  padding: 100px 8%;
+  padding: 80px 8%;
+
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  gap: 120px;
+
+  gap: 60px;
+
+  max-width: 1400px;
+  margin: 0 auto;
 
   background:
-    radial-gradient(
-      circle at 85% 20%,
-      #ffe1d8 0,
-      transparent 25%
-    ),
-
-    radial-gradient(
-      circle at 10% 80%,
-      #e5e5ff 0,
-      transparent 25%
-    ),
-
+    radial-gradient(circle at 85% 20%, #ffe1d8 0, transparent 25%),
+    radial-gradient(circle at 10% 80%, #e5e5ff 0, transparent 25%),
     #f7f7f8;
 }
 
 
-.hero-content {
-  max-width: 560px;
+.hero-content{
+  flex:1;
+  max-width:620px;
 }
 
 
@@ -125,11 +121,16 @@ a {
 }
 
 
-.hero h1 {
-  font-size: clamp(48px, 7vw, 80px);
-  line-height: 0.98;
-  letter-spacing: -4px;
-  margin-bottom: 28px;
+.hero h1{
+
+  max-width:650px;
+
+  font-size:clamp(52px,7vw,82px);
+
+  line-height:1;
+
+  letter-spacing:-3px;
+
 }
 
 
@@ -170,7 +171,7 @@ a {
 ========================= */
 
 .message-phone {
-  width: 300px;
+ width:340px;
   min-height: 500px;
   padding: 24px;
   border-radius: 32px;
