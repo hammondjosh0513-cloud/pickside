@@ -1,0 +1,158 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  color: #222;
+}
+
+.app {
+  min-height: 100vh;
+}
+
+.navbar {
+  height: 70px;
+  padding: 0 8%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: white;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.navbar h2 {
+  font-size: 24px;
+}
+
+.create-btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  background-color: #222;
+  color: white;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.hero {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 130px 20px;
+  text-align: center;
+}
+
+.small-text {
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+}
+
+.hero h1 {
+  font-size: 55px;
+  line-height: 1.1;
+  margin-bottom: 25px;
+}
+
+.description {
+  max-width: 500px;
+  margin: 0 auto 30px;
+  font-size: 18px;
+  line-height: 1.6;
+  color: #666;
+}
+
+.main-btn {
+  display: inline-block;
+  padding: 14px 25px;
+  border: none;
+  border-radius: 6px;
+  background-color: #222;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.main-btn:hover,
+.create-btn:hover {
+  background-color: #444;
+}
+
+.create-page {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 100px 20px;
+}
+
+.create-page h1 {
+  margin-bottom: 15px;
+}
+
+@media (max-width: 600px) {
+  .navbar {
+    padding: 0 20px;
+  }
+
+  .hero {
+    padding: 100px 20px;
+  }
+
+  .hero h1 {
+    font-size: 40px;
+  }
+
+  .description {
+    font-size: 16px;
+  }
+}
+.create-description {
+  margin-bottom: 30px;
+  color: #666;
+}
+
+.question-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.question-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-weight: bold;
+}
+
+.question-form input,
+.question-form select {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+  font-family: Arial, sans-serif;
+}
+
+.question-form input:focus,
+.question-form select:focus {
+  outline: none;
+  border-color: #222;
+}
+
+.submit-btn {
+  padding: 13px;
+  border: none;
+  border-radius: 6px;
+  background-color: #222;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.submit-btn:hover {
+  background-color: #444;
+}
