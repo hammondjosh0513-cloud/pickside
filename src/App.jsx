@@ -11,6 +11,8 @@ import {
 
 import './App.css'
 
+import { supabase } from "./supabase"
+
 
 function Home() {
 
@@ -233,58 +235,49 @@ function UserPage() {
 
   const { username } = useParams()
 
-  const [message, setMessage] = useState('')
+  const [message, setMessage] = useState("")
 
   const [sent, setSent] = useState(false)
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
 
     event.preventDefault()
 
     if (!message.trim()) {
 
-      alert('Please write a message first')
+      alert("Please write a message first")
 
       return
 
     }
 
-    // Each user has their own inbox
-    const storageKey = `pickside-${username}`
+    const { error } = await supabase
 
-    const savedMessages = JSON.parse(
+      .from("messages")
 
-      localStorage.getItem(storageKey)
+      .insert([
 
-    ) || []
+        {
 
-   const newMessage = {
+          username,
 
-  id: Date.now().toString(),
+          question: message.trim()
 
-  text: message.trim(),
+        }
 
-  date: new Date().toLocaleString(),
+      ])
 
-  replied: false,
+    if (error) {
 
-  reply: ''
+      alert(error.message)
 
-}
+      return
 
-    savedMessages.push(newMessage)
-
-    localStorage.setItem(
-
-      storageKey,
-
-      JSON.stringify(savedMessages)
-
-    )
+    }
 
     setSent(true)
 
-    setMessage('')
+    setMessage("")
 
     setTimeout(() => {
 
